@@ -2,21 +2,24 @@ import os
 from typing import List
 from dotenv import load_dotenv
 
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.docstore.document import Document
-from langchain.chat_models import ChatOpenAI
-from sqlalchemy.orm import Session
-from database import PYQ
-
-
-# Load environment variables from the .env file
 load_dotenv()
 
-# Get OpenAI API key 
+# Get OpenAI API key from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-embedding = OpenAIEmbeddings()
+# Validate API key exists
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY not found in environment variables. Please check your .env file.")
+
+# Set OpenAI API key for LangChain
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from sqlalchemy.orm import Session
+from database import PYQ
+embedding = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 def load_vectorstore_from_db(session: Session, subject: str = None) -> FAISS:
     """
@@ -97,49 +100,24 @@ def nlp_chunk_text(text: str, max_sentences: int = 5) -> List[str]:
 
     return chunks
 
-
-# def process_notes_and_match_pyqs(text: str, subject: str, session: Session, k: int = 3):
-
-    # """
-    # Processes the notes text: chunk, infer subtopic, and get matching PYQs from DB.
-    # """
-    # chunks = nlp_chunk_text(text)
-    # results = []
-
-    # for chunk in chunks:
-    #     # subtopic = infer_subtopic(chunk)
-    #     # Replace the LLM call with database lookup
-    #     if related_qs:
-    #         subtopic = related_qs[0].metadata.get('sub_topic', 'General')
-    #     else:
-    #         subtopic = "No matches found"
-
-    #     matches = get_relevant_pyqs(session, chunk, subject, k=k)
-    #     results.append({
-    #         "chunk": chunk,
-    #         "subtopic": subtopic,
-    #         "matches": matches
-    #     })
-
-    # return results
-    def process_notes_and_match_pyqs(text: str, subject: str, session: Session, k: int = 3):
-        chunks = nlp_chunk_text(text)
-        results = []
+def process_notes_and_match_pyqs(text: str, subject: str, session: Session, k: int = 3):
+    chunks = nlp_chunk_text(text)
+    results = []
+    
+    for chunk in chunks:
+        # Get matches first
+        matches = get_relevant_pyqs(session, chunk, subject, k=k)
         
-        for chunk in chunks:
-            # Get matches first
-            matches = get_relevant_pyqs(session, chunk, subject, k=k)
+        # Then extract subtopic from database results
+        if matches:
+            subtopic = matches[0].metadata.get('sub_topic', 'General')
+        else:
+            subtopic = "No matches found"
             
-            # Then extract subtopic from database results
-            if matches:
-                subtopic = matches[0].metadata.get('sub_topic', 'General')
-            else:
-                subtopic = "No matches found"
-                
-            results.append({
-                "chunk": chunk,
-                "subtopic": subtopic,
-                "matches": matches
-            })
-        return results
+        results.append({
+            "chunk": chunk,
+            "subtopic": subtopic,
+            "matches": matches
+        })
+    return results
 

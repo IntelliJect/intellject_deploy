@@ -7,8 +7,8 @@ import os
 # Load environment variables from .env
 load_dotenv()
 
-# Create the full database URL from environment variable or fallback
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pyq_database.db")  # Added fallback
+# Create the full database URL from environment variable
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Setup engine and session
 engine = create_engine(DATABASE_URL)
@@ -17,7 +17,6 @@ SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 # Declare Base
 Base = declarative_base()
 
-# PYQ table model (CLEANED - NO DIFFICULTY)
 class PYQ(Base):
     __tablename__ = "pyqs"
 
@@ -34,7 +33,7 @@ class PYQ(Base):
         Index("idx_pyqs_year", "year"),
     )
 
-    def __repr__(self):  # Fixed: was _repr_
+    def __repr__(self):  
         return (
             f"<PYQ(id={self.id}, subject='{self.subject}', "
             f"sub_topic='{self.sub_topic}', year={self.year}, marks={self.marks})>"
@@ -62,5 +61,5 @@ def get_db():
         db.close()
 
 # Initialize tables on import (optional)
-if __name__ == "__main__":  # Fixed: was "_main_"
+if __name__ == "__main__":  
     create_tables()

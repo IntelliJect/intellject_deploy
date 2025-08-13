@@ -1,12 +1,13 @@
-streamlit>=1.28.0
-python-dotenv>=1.0.0
-sqlalchemy>=2.0.0
-psycopg2-binary>=2.9.0
-openai>=1.0.0
-langchain>=0.1.0
-langchain-openai>=0.0.5
-faiss-cpu>=1.7.4
-PyMuPDF>=1.23.0
-Pillow>=10.0.0
-nltk>=3.8.0
-typing-extensions>=4.0.0
+streamlit>=1.28.0          # Web application framework
+python-dotenv>=1.0.0       # Environment variable management
+sqlalchemy>=2.0.0          # Database ORM
+psycopg2-binary>=2.9.0     # PostgreSQL adapter
+openai>=1.0.0              # OpenAI API client
+langchain-openai==0.3.29   # LangChain OpenAI integration
+langchain-community==0.3.27 # LangChain community integrations (includes FAISS)
+langchain-core==0.3.73     # LangChain core abstractions
+faiss-cpu>=1.7.4           # Vector similarity search
+PyMuPDF>=1.23.0            # PDF text extraction
+Pillow>=10.0.0             # Image processing
+nltk>=3.8.0                # Natural language processing
+typing-extensions>=4.0.0   # Type hints support

@@ -1,5 +1,3 @@
-# utils.py
-
 import fitz  # PyMuPDF
 import re
 from typing import List, Optional
@@ -61,16 +59,6 @@ def chunk_text(text: str, chunk_size: int = 500) -> List[str]:
             chunks.append(chunk)
     
     return chunks
-
-def highlight_chunks(text: str) -> str:
-    """
-    HTML highlighting of text chunks for display.
-    Note: This function is not used in the main application but kept for utility.
-    """
-    if not text:
-        return ""
-    
-    return f"<div style='background-color:#f9f9f9;padding:10px;border-left:4px solid #4CAF50;margin-bottom:10px'>{text}</div>"
 
 def clean_text(text: str) -> str:
     """
